@@ -124,8 +124,10 @@ class PrimAlgorithm extends FieldController {
             cell.payload.isWall = this.cells[check.clearPoint.x][check.clearPoint.y].payload.isWall = false;
 
             this.toCheck.push(...this.GetAvailablePoints(p));
-        }, () => {
+        },
+        () => {
             if (this.shrinkingCount >= this.maxShrinkingCount) {
+                this.shrinkingCount = 0;
                 this.stage++;
                 return;
             }
@@ -142,8 +144,10 @@ class PrimAlgorithm extends FieldController {
             for (let cell of toShrink) {
                 cell.payload.isWall = true;
             }
-        }, () => {
+        },
+        () => {
             if (this.carvingCount >= this.maxCarvingCount) {
+                this.carvingCount = 0;
                 this.stage++;
                 return;
             }
@@ -159,6 +163,26 @@ class PrimAlgorithm extends FieldController {
             }
             for (let cell of toCarve) {
                 cell.payload.isWall = false;
+            }
+        },
+        () => {
+            if (this.shrinkingCount >= this.maxShrinkingCount) {
+                this.shrinkingCount = 0;
+                this.stage++;
+                return;
+            }
+            this.shrinkingCount++;
+            let toShrink = new Array<Cell>();
+            for (let x = 0; x < this.cells.length; x++) {
+                for (let y = 0; y < this.cells[0].length; y++) {
+                    let cell = this.cells[x][y];
+                    if (!cell.payload.isWall && this.Shrinkable(new Vec2(x, y))) {
+                        toShrink.push(cell);
+                    }
+                }
+            }
+            for (let cell of toShrink) {
+                cell.payload.isWall = true;
             }
         }
     ]
