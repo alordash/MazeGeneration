@@ -1,23 +1,23 @@
+
+
 class CanvasManager {
     private _width: number;
     private _height: number;
     p5: p5;
-    constructor(width: number, height: number) {
+
+    sizeValuesProcessor = (v: number) => { return v; };
+
+    constructor(width: number, height: number, p5: p5) {
         this._width = width;
         this._height = height;
-        this.p5 = new p5(() => { });
-        (this.p5.setup = () => {
-            let canvasElement = this.p5.createCanvas(this._width, this._height);
-            canvasElement.style('border', '#aaaaaa')
-                .style('borderStyle', 'solid')
-                .style('border-width', '3px');
-            let element = <HTMLElement>canvasElement.elt;
-            document.getElementById('Editor').appendChild(element);
-            this.reset();
-        })();
+        this.p5 = p5;
     }
 
-    reset() {
+    reset(processSizeValues = false) {
+        if (processSizeValues) {
+            this._width = this.sizeValuesProcessor(this._width);
+            this._height = this.sizeValuesProcessor(this._height);
+        }
         this.p5.resizeCanvas(this._width, this._height);
         this.p5.background(0);
         this.p5.fill(255);
@@ -30,7 +30,7 @@ class CanvasManager {
     }
 
     public set width(v: number) {
-        this._width = v;
+        this._width = this.sizeValuesProcessor(v);
         this.reset();
     }
 
@@ -39,7 +39,7 @@ class CanvasManager {
     }
 
     public set height(v: number) {
-        this._height = v;
+        this._height = this.sizeValuesProcessor(v);
         this.reset();
     }
 }
