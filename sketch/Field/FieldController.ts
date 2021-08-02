@@ -28,7 +28,7 @@ class FieldController {
         return q;
     }
 
-    optionalReset = () => { };
+    optionalReset = (hard: boolean = false) => { };
 
     constructor(canvasManager: CanvasManager, step: number) {
         this._step = step;
@@ -41,7 +41,7 @@ class FieldController {
         this.Reset();
     }
 
-    Reset() {
+    Reset(hard = false) {
         let kx = this.Quantiz(this.canvasManager.width);
         let ky = this.Quantiz(this.canvasManager.height);
 
@@ -57,8 +57,14 @@ class FieldController {
             }
         }
         this.cells = newCells;
-        this.optionalReset();
+        this.optionalReset(hard);
         this.Draw();
+    }
+    
+    HardReset() {
+        this.canvasManager.Reset(true);
+        this.cells = new Array<Array<Cell>>();
+        this.Reset(true);
     }
 
     Draw() {

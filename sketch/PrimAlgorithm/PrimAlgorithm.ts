@@ -27,9 +27,12 @@ class PrimAlgorithm extends FieldController {
     constructor(canvasManager: CanvasManager, step: number, spawn: Vec2 = PrimAlgorithm.GetSpawn(canvasManager.width, canvasManager.height, step)) {
         super(canvasManager, step);
         this.spawn = spawn;
-        this.cells[this.spawn.x][this.spawn.y].payload = PrimAlgorithm.SpawnPayload;
-        this.optionalReset = () => {
-            if (!Calc.IsInside(this.spawn.x, this.spawn.y, this.cells)) {
+        this.MarkSpawn();
+        this.optionalReset = (hard: boolean = false) => {
+            if (hard || !Calc.IsInside(this.spawn.x, this.spawn.y, this.cells)) {
+                this.stage = 0;
+                this.shrinkingCount = 0;
+                this.carvingCount = 0;
                 this.spawn = PrimAlgorithm.GetSpawn(this.canvasManager.width, this.canvasManager.height, this.step);
                 this.toCheck = this.GetAvailablePoints(this.spawn);
                 this.MarkSpawn();
@@ -163,6 +166,7 @@ class PrimAlgorithm extends FieldController {
     Evolve() {
         if (this.stage >= this.stageActions.length) {
             console.log('Done evolving');
+            this.HardReset();
         } else {
             this.stageActions[this.stage]();
         }

@@ -28,6 +28,8 @@ function main() {
     fieldController = new PrimAlgorithm(canvasManager, step);
     console.log('main done');
     fieldController.Draw();
+
+    UIControl.Init();
 }
 
 setTimeout(main, 10);

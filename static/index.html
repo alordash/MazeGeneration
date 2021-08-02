@@ -62,7 +62,6 @@
       display: inline-block;
       cursor: pointer;
       color: #ffffff;
-      font-family: Arial;
       font-size: 13px;
       padding: 2px 24px;
       text-decoration: none;
@@ -92,14 +91,16 @@
 </head>
 
 <body style="font-size: 16px; font-family: monospace;">
-  Width: &nbsp;<input type="text" id="WidthInput" value="600" class="textInput"> <button id="EvolveButton" class="button">Evolve</button> <br/>
-  Height: <input type="text" id="HeightInput" value="600" class="textInput"> <br/>
-  Step: &nbsp;&nbsp;<input type="text" id="StepInput" value="30" class="textInput"> <br/>
+  Width: &nbsp;<input type="text" id="WidthInput" value="600" class="textInput">
+  <button id="EvolveButton" class="button">Evolve</button> <br />
+  Height: <input type="text" id="HeightInput" value="600" class="textInput">
+  <button id="HardResetButton" class="button">Reset</button> <br />
+  Step: &nbsp;&nbsp;<input type="text" id="StepInput" value="30" class="textInput"> <br />
   <input type="checkbox" id="TimeCheckbox" style="left: 5px;position: relative;">
-  Time:
-  <div id="energydiv" style="position: absolute; top: 11px; left: 350px; visibility: hidden;">
-    <input id="energyrange" type="range" class="rangeParam" min="-1" max="200000" step="1000"
-      style="position: initial;">
+  Time
+  <div id="speeddiv" style="visibility: hidden;">
+    Step
+    <input id="speedrange" type="range" class="rangeParam" min="1" max="5" step="1" style="position: initial;">
     <a href="#" id="PlayButton" class="playButton"
       style="background-color: rgb(50, 208, 27); display: inline-block;">Play</a>
   </div>

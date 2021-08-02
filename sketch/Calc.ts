@@ -1,4 +1,4 @@
-class Calc {
+abstract class Calc {
     static IsInside<T>(x: number, y: number, a: Array<Array<T>>) {
         return a.length > 0 && 0 <= x && x < a.length && 0 <= y && y < a[0].length;
     }
