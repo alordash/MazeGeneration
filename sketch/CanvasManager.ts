@@ -13,7 +13,7 @@ class CanvasManager {
         this.p5 = p5;
     }
 
-    reset(processSizeValues = false) {
+    Reset(processSizeValues = false) {
         if (processSizeValues) {
             this._width = this.sizeValuesProcessor(this._width);
             this._height = this.sizeValuesProcessor(this._height);
@@ -31,7 +31,7 @@ class CanvasManager {
 
     public set width(v: number) {
         this._width = this.sizeValuesProcessor(v);
-        this.reset();
+        this.Reset();
     }
 
     public get height(): number {
@@ -40,6 +40,6 @@ class CanvasManager {
 
     public set height(v: number) {
         this._height = this.sizeValuesProcessor(v);
-        this.reset();
+        this.Reset();
     }
 }

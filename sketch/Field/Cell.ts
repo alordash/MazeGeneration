@@ -1,12 +1,20 @@
 /// <reference path ="Geometry.ts" />
 
 class Payload {
-    v: number;
-    constructor(v: number) {
-        this.v = v;
+    isWall: boolean;
+    constructor(isWall: boolean) {
+        this.isWall = isWall;
     }
 
-    static Default = new Payload(0);
+    Copy() {
+        return new Payload(this.isWall);
+    }
+
+    private static _Default = new Payload(true);
+
+    static get Default(): Payload {
+        return this._Default.Copy();
+    }
 }
 
 class Cell {

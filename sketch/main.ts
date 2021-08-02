@@ -1,9 +1,10 @@
 /// <reference path="CanvasManager.ts" />
 /// <reference path="UIControl.ts" />
 /// <reference path="Field/FieldController.ts" />
+/// <reference path="PrimAlgorithm/PrimAlgorithm.ts" />
 
 let canvasManager: CanvasManager;
-let fieldController: FieldController;
+let fieldController: PrimAlgorithm;
 
 var p5Sketch = (_p: p5) => {
     _p.setup = () => {
@@ -19,13 +20,14 @@ var p5Sketch = (_p: p5) => {
 let _p = new p5(p5Sketch);
 
 function main() {
-    canvasManager = new CanvasManager(
-        parseInt((<HTMLInputElement>document.getElementById("WidthInput")).value),
-        parseInt((<HTMLInputElement>document.getElementById("HeightInput")).value),
-        _p
-    );
+    const w = parseInt((<HTMLInputElement>document.getElementById("WidthInput")).value);
+    const h = parseInt((<HTMLInputElement>document.getElementById("HeightInput")).value);
+    const step = parseInt((<HTMLInputElement>document.getElementById("StepInput")).value);
+    canvasManager = new CanvasManager(w, h, _p);
 
-    fieldController = new FieldController(canvasManager, parseInt((<HTMLInputElement>document.getElementById("StepInput")).value));
+    fieldController = new PrimAlgorithm(canvasManager, step);
+    console.log('main done');
+    fieldController.Draw();
 }
 
 setTimeout(main, 10);

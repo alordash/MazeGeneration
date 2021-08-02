@@ -6,10 +6,12 @@ class Vec2 {
         this.x = x;
         this.y = y;
     }
-}
 
-class Calc {
-    static IsInside<T>(x: number, y: number, a: Array<Array<T>>) {
-        return a.length > 0 && 0 <= x && x < a.length && 0 <= y && y < a[0].length;
+    Sum(p: Vec2) {
+        return new Vec2(this.x + p.x, this.y + p.y);
+    }
+
+    Mul(k: number) {
+        return new Vec2(this.x * k, this.y * k);
     }
 }

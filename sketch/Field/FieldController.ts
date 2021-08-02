@@ -9,8 +9,14 @@ class FieldController {
     cells: FieldType;
 
     Quantiz(v: number) {
-        return Math.round(v / this._step);
+        let q = Math.round(v / this._step);
+        if ((q & 0b1) == 0) {
+            q++;
+        }
+        return q;
     }
+
+    optionalReset = () => { };
 
     constructor(canvasManager: CanvasManager, step: number) {
         this._step = step;
@@ -18,12 +24,12 @@ class FieldController {
         this.canvasManager.sizeValuesProcessor = (v) => {
             return this.Quantiz(v) * this._step;
         }
-        this.canvasManager.reset(true);
+        this.canvasManager.Reset(true);
         this.cells = new Array<Array<Cell>>();
-        this.reset();
+        this.Reset();
     }
 
-    reset() {
+    Reset() {
         let kx = this.Quantiz(this.canvasManager.width);
         let ky = this.Quantiz(this.canvasManager.height);
 
@@ -39,14 +45,15 @@ class FieldController {
             }
         }
         this.cells = newCells;
-        this.draw();
+        this.optionalReset();
+        this.Draw();
     }
 
-    draw() {
+    Draw() {
         let p = this.canvasManager.p5;
         for (let arr of this.cells) {
             for (let cell of arr) {
-                let v = cell.payload.v;
+                let v = cell.payload.isWall ? 0 : 255;
                 p.fill(v);
                 p.stroke(v);
                 p.rect(cell.pos.x * this._step, cell.pos.y * this._step, this._step, this._step);
@@ -60,7 +67,7 @@ class FieldController {
 
     public set step(v: number) {
         this._step = v;
-        this.canvasManager.reset(true);
-        this.reset();
+        this.canvasManager.Reset(true);
+        this.Reset();
     }
 }
