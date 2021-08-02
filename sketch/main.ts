@@ -1,3 +1,6 @@
+/// <reference path="CanvasManager.ts" />
+/// <reference path="UIControl.ts" />
+
 let canvasManager: CanvasManager;
 
 function main() {
