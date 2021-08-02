@@ -4,13 +4,13 @@
 type CheckType = { checkPoint: Vec2, clearPoint: Vec2 };
 
 class PrimAlgorithm extends FieldController {
-    static Directions = [new Vec2(2, 0), new Vec2(0, -2), new Vec2(-2, 0), new Vec2(0, 2)];
-
     static GetSpawn(w: number, h: number, step: number) {
         let x = Calc.Odd(Calc.IntRand(1, Math.floor(w / step) - 1));
         let y = Calc.Odd(Calc.IntRand(1, Math.floor(h / step) - 1));
         return new Vec2(x, y);
     }
+
+    stage = 0;
 
     private static _SpawnPayload = new Payload(false);
     static get SpawnPayload() {
@@ -43,13 +43,13 @@ class PrimAlgorithm extends FieldController {
 
     GetAvailablePoints(p: Vec2) {
         let points = new Array<CheckType>();
-        let order = new Array<number>(PrimAlgorithm.Directions.length);
+        let order = new Array<number>(FieldController.Directions.length);
         for (let i = 0; i < order.length; i++) {
             order[i] = i;
         }
         Calc.Shuffle(order);
         for (const i of order) {
-            const direction = PrimAlgorithm.Directions[i];
+            const direction = FieldController.Directions[i];
             let newPoint = p.Sum(direction);
             if (Calc.IsPointInside(newPoint, this.cells) && this.cells[newPoint.x][newPoint.y].payload.isWall) {
                 points.push({ checkPoint: newPoint, clearPoint: p.Sum(direction.Mul(0.5)) });
@@ -69,21 +69,30 @@ class PrimAlgorithm extends FieldController {
         return points;
     }
 
-    Evolve() {
-        if (this.toCheck.length == 0) {
-            return;
-        }
-        let index = Calc.IntRand(0, this.toCheck.length - 1);
-        let check = this.toCheck[index];
-        this.toCheck.splice(index, 1);
-        let p = check.checkPoint;
-        let cell = this.cells[p.x][p.y];
-        if (!cell.payload.isWall) {
-            this.Evolve();
-            return;
-        }
-        cell.payload.isWall = this.cells[check.clearPoint.x][check.clearPoint.y].payload.isWall = false;
+    stageActions = [
+        () => {
+            if (this.toCheck.length == 0) {
+                this.stage++;
+                return;
+            }
+            let index = Calc.IntRand(0, this.toCheck.length - 1);
+            let check = this.toCheck[index];
+            this.toCheck.splice(index, 1);
+            let p = check.checkPoint;
+            let cell = this.cells[p.x][p.y];
+            if (!cell.payload.isWall) {
+                this.Evolve();
+                return;
+            }
+            cell.payload.isWall = this.cells[check.clearPoint.x][check.clearPoint.y].payload.isWall = false;
 
-        this.toCheck.push(...this.GetAvailablePoints(p));
+            this.toCheck.push(...this.GetAvailablePoints(p));
+        }, () => {
+            console.log('ok');
+        }
+    ]
+
+    Evolve() {
+        this.stageActions[this.stage]();
     }
 }

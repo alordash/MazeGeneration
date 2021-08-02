@@ -4,6 +4,8 @@
 type FieldType = Array<Array<Cell>>;
 
 class FieldController {
+    static Directions = [new Vec2(2, 0), new Vec2(0, -2), new Vec2(-2, 0), new Vec2(0, 2)];
+    
     canvasManager: CanvasManager;
     private _step: number;
     cells: FieldType;
