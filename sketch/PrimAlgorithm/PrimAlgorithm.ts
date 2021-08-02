@@ -75,6 +75,8 @@ class PrimAlgorithm extends FieldController {
         let k = 0;
         for (const loc of FieldController.Directions) {
             let _p = p.Sum(loc.Mul(0.5));
+            if (!Calc.IsInside(_p.x, _p.y, this.cells))
+                continue;
             if (!this.cells[_p.x][_p.y].payload.isWall) {
                 k++;
                 if (k > 1)
@@ -82,6 +84,23 @@ class PrimAlgorithm extends FieldController {
             }
         }
         return k <= 1;
+    }
+
+    carvingCount = 0;
+    maxCarvingCount = 3;
+    Carvable(p: Vec2) {
+        let k = 0;
+        for (const loc of FieldController.NeighboursLocs) {
+            let _p = p.Sum(loc);
+            if (!Calc.IsInside(_p.x, _p.y, this.cells))
+                continue;
+            if (!this.cells[_p.x][_p.y].payload.isWall) {
+                k++;
+                if (k >= 4)
+                    return true;
+            }
+        }
+        return k >= 4;
     }
 
     stageActions = [
@@ -117,8 +136,26 @@ class PrimAlgorithm extends FieldController {
                     }
                 }
             }
-            for(let cell of toShrink) {
+            for (let cell of toShrink) {
                 cell.payload.isWall = true;
+            }
+        }, () => {
+            if (this.carvingCount >= this.maxCarvingCount) {
+                this.stage++;
+                return;
+            }
+            this.carvingCount++;
+            let toCarve = new Array<Cell>();
+            for (let x = 0; x < this.cells.length; x++) {
+                for (let y = 0; y < this.cells[0].length; y++) {
+                    let cell = this.cells[x][y];
+                    if (cell.payload.isWall && this.Carvable(new Vec2(x, y))) {
+                        toCarve.push(cell);
+                    }
+                }
+            }
+            for (let cell of toCarve) {
+                cell.payload.isWall = false;
             }
         }
     ]
