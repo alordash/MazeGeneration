@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.dom.min.js"></script>
+  <meta charset="utf-8" />
+  <style>
+    .info {
+      background: rgb(255, 245, 206);
+      padding: 2px;
+      border: solid 1px black;
+      margin-top: 5px;
+      margin-bottom: 5px;
+      font-weight: 500;
+      font-size: 18px;
+      font-family: monospace;
+      color: black;
+      white-space: nowrap;
+      overflow-x: hidden;
+    }
+
+    .textInput {
+      width: 100px;
+      background: rgb(255, 245, 206);
+      padding: 2px;
+      margin-top: 5px;
+      margin-bottom: 5px;
+      font-family: monospace;
+      color: black;
+      white-space: nowrap;
+      overflow-x: hidden;
+      border: solid 2px #f0aa9aab;
+    }
+
+    .textInput:hover {
+      border: dashed 2px #f0aa9aab;
+    }
+
+    .textInput:active {
+      background-color: rgb(241, 219, 189);
+      border: double 2px #00000000;
+    }
+
+    .rangeParam {
+      position: absolute;
+      width: 150px;
+      left: 100px;
+    }
+
+    .options {
+      font-size: 22px;
+    }
+
+    .button {
+      font-size: 20px;
+    }
+
+    .playButton {
+      border-radius: 3px;
+      border: 1px solid #942911;
+      display: inline-block;
+      cursor: pointer;
+      color: #ffffff;
+      font-family: Arial;
+      font-size: 13px;
+      padding: 2px 24px;
+      text-decoration: none;
+      text-shadow: 0px 1px 0px #854629;
+    }
+
+    .playButton:active {
+      position: relative;
+      top: 1px;
+    }
+
+    .sourceLink {
+      text-decoration: none;
+      background-color: rgb(246, 248, 250);
+      border-radius: 15px;
+      border: 1.5px solid lightsteelblue;
+    }
+
+    .sourceLink:hover {
+      background-color: antiquewhite;
+    }
+
+    .sourceLink:active {
+      box-shadow: inset 0 0 6px black;
+    }
+  </style>
+</head>
+
+<body style="font-size: 16px; font-family: monospace;">
+  Width: &nbsp;<input type="text" id="WidthInput" value="600" class="textInput"> <br/>
+  Height: <input type="text" id="HeightInput" value="600" class="textInput"> <br/>
+  <input type="checkbox" id="TimeCheckbox" style="left: 5px;position: relative;">
+  Time:
+  <div id="energydiv" style="position: absolute; top: 11px; left: 350px; visibility: hidden;">
+    <input id="energyrange" type="range" class="rangeParam" min="-1" max="200000" step="1000"
+      style="position: initial;">
+    <a href="#" id="PlayButton" class="playButton"
+      style="background-color: rgb(50, 208, 27); display: inline-block;">Play</a>
+  </div>
+  <div id="Editor">
+    <div id="Params" class="info" style="width: 100px; padding: 5px;">
+      <b>Parameters</b>
+    </div>
+  </div>
+  <a title="Source page" href="https://github.com/alordash/MazeGeneration" class="sourceLink"
+    style="position: absolute;bottom: 10px;left: 7px; ">
+    <div style="padding: 4px; padding-bottom: 2px;">
+      <span style="color: #6a737d; position: relative; top: -6px;">MazeGeneration</span>
+      <svg height="24" viewBox="0 0 16 16" version="1.1" width="24" aria-hidden="true">
+        <path fill-rule="evenodd"
+          d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+        </path>
+      </svg>
+    </div>
+  </a>
+  <script src="./build.js"></script>
+</body>
+
+</html>

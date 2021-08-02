@@ -1,0 +1,13 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "module": "None",
+    "rootDir": "./sketch/",
+    "preserveConstEnums": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "outFile": "./static/build.js",
+    "target": "ES6",
+    "moduleResolution": "node"
+  }
+}

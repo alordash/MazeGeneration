@@ -1,0 +1,25 @@
+{
+  "name": "mazegeneration",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alordash/MazeGeneration.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alordash/MazeGeneration/issues"
+  },
+  "homepage": "https://github.com/alordash/MazeGeneration#readme",
+  "dependencies": {
+    "@types/p5": "^1.3.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.3.5"
+  }
+}
