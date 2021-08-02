@@ -6,14 +6,14 @@ class Payload {
         this.v = v;
     }
 
-    static Default = new Payload(100);
+    static Default = new Payload(0);
 }
 
 class Cell {
     pos: Vec2;
     payload: Payload;
 
-    constructor(pos: Vec2, payload: Payload = new Payload(Math.random() * 255)) {
+    constructor(pos: Vec2, payload: Payload = Payload.Default) {
         this.pos = pos;
         this.payload = payload;
     }

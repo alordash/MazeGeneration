@@ -34,11 +34,7 @@ class FieldController {
                 if (Calc.IsInside(x, y, this.cells)) {
                     newCells[x][y] = this.cells[x][y];
                 } else {
-                    let v = undefined;
-                    if (x == 0 || y == 0 || x == kx - 1 || y == ky - 1) {
-                        v = new Payload(0);
-                    }
-                    newCells[x][y] = new Cell(new Vec2(x, y), v);
+                    newCells[x][y] = new Cell(new Vec2(x, y));
                 }
             }
         }
