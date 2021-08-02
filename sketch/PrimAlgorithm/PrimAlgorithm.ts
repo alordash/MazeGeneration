@@ -69,6 +69,21 @@ class PrimAlgorithm extends FieldController {
         return points;
     }
 
+    shrinkingCount = 0;
+    maxShrinkingCount = 3;
+    Shrinkable(p: Vec2) {
+        let k = 0;
+        for (const loc of FieldController.Directions) {
+            let _p = p.Sum(loc.Mul(0.5));
+            if (!this.cells[_p.x][_p.y].payload.isWall) {
+                k++;
+                if (k > 1)
+                    return false;
+            }
+        }
+        return k <= 1;
+    }
+
     stageActions = [
         () => {
             if (this.toCheck.length == 0) {
@@ -88,11 +103,31 @@ class PrimAlgorithm extends FieldController {
 
             this.toCheck.push(...this.GetAvailablePoints(p));
         }, () => {
-            console.log('ok');
+            if (this.shrinkingCount >= this.maxShrinkingCount) {
+                this.stage++;
+                return;
+            }
+            this.shrinkingCount++;
+            let toShrink = new Array<Cell>();
+            for (let x = 0; x < this.cells.length; x++) {
+                for (let y = 0; y < this.cells[0].length; y++) {
+                    let cell = this.cells[x][y];
+                    if (!cell.payload.isWall && this.Shrinkable(new Vec2(x, y))) {
+                        toShrink.push(cell);
+                    }
+                }
+            }
+            for(let cell of toShrink) {
+                cell.payload.isWall = true;
+            }
         }
     ]
 
     Evolve() {
-        this.stageActions[this.stage]();
+        if (this.stage >= this.stageActions.length) {
+            console.log('Done evolving');
+        } else {
+            this.stageActions[this.stage]();
+        }
     }
 }

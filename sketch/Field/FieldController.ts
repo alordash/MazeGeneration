@@ -5,7 +5,17 @@ type FieldType = Array<Array<Cell>>;
 
 class FieldController {
     static Directions = [new Vec2(2, 0), new Vec2(0, -2), new Vec2(-2, 0), new Vec2(0, 2)];
-    
+    static NeighboursLocs = [
+        new Vec2(1, 0),
+        new Vec2(1, -1),
+        new Vec2(0, -1),
+        new Vec2(-1, -1),
+        new Vec2(-1, 0),
+        new Vec2(-1, 1),
+        new Vec2(0, 1),
+        new Vec2(1, 1)
+    ];
+
     canvasManager: CanvasManager;
     private _step: number;
     cells: FieldType;
