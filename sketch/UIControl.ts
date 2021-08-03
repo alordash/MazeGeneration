@@ -30,6 +30,7 @@ abstract class UIControl {
         document.getElementById("EvolveButton").onclick = ev => {
             fieldController.Evolve();
             fieldController.Draw();
+            document.getElementById("StageDiv").innerHTML = `<b>Stage: ${fieldController.stage}</b>`;
         };
 
         document.getElementById("HardResetButton").onclick = ev => {
