@@ -2,9 +2,8 @@ let playTimer: NodeJS.Timer;
 let playing = false;
 let playStep = 50;
 
-let time = 6;
-let fps = 10;
 let speed = 1;
+let speedDivision = 20;
 
 const pause = 500;
 
@@ -23,7 +22,8 @@ abstract class UIControl {
             stageDiv.style.background = `#1dd12c`;
             setTimeout(() => {
                 stageDiv.style.background = ``;
-                playing = !playing;
+                playing = true;
+                UIControl.TimeRangeClick();
                 UIControl.TimeRangeClick();
             }, pause);
             res = true;
@@ -63,9 +63,11 @@ abstract class UIControl {
         if (playing) {
             playButton.style.backgroundColor = "#d0451b";
             playButton.textContent = "Stop";
+            let fps = Math.min(speed, speedDivision);
             playTimer = setInterval(() => {
-                for (let i = 0; i < speed; i++) {
-                    if (UIControl.UIEvolve(i == speed - 1)) {
+                let end = Math.max(1, speed - speedDivision);
+                for (let i = 0; i < end; i++) {
+                    if (UIControl.UIEvolve(i == (end - 1))) {
                         fieldController.Draw();
                         return;
                     }
@@ -81,6 +83,9 @@ abstract class UIControl {
     static SpeedChange = () => {
         speed = +(<HTMLInputElement>document.getElementById('speedrange')).value;
         document.getElementById("speeddiv").innerHTML = `Speed: ${speed}`;
+        playing = true;
+        UIControl.TimeRangeClick();
+        UIControl.TimeRangeClick();
     }
 
     static InitTimeRange() {
