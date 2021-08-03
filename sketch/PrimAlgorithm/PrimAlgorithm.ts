@@ -19,6 +19,7 @@ class PrimAlgorithm extends FieldController {
 
     spawn: Vec2;
     toCheck: Array<CheckType>;
+    toProcess: Array<Cell>;
 
     MarkSpawn(payload: Payload = PrimAlgorithm.SpawnPayload) {
         this.cells[this.spawn.x][this.spawn.y].payload = payload;
@@ -41,6 +42,7 @@ class PrimAlgorithm extends FieldController {
             }
         }
         this.toCheck = this.GetAvailablePoints(this.spawn);
+        this.toProcess = new Array<Cell>();
         this.Draw();
     }
 
@@ -113,21 +115,21 @@ class PrimAlgorithm extends FieldController {
         if (this.shrinkingCount >= this.maxShrinkingCount) {
             this.shrinkingCount = 0;
             this.stage++;
+            this.toProcess.splice(0);
             return true;
         }
-        this.shrinkingCount++;
-        let toShrink = new Array<Cell>();
-        for (let x = 0; x < this.cells.length; x++) {
-            for (let y = 0; y < this.cells[0].length; y++) {
-                let cell = this.cells[x][y];
-                if (!cell.payload.isWall && this.Shrinkable(new Vec2(x, y))) {
-                    toShrink.push(cell);
+        if (this.toProcess.length == 0) {
+            this.shrinkingCount++;
+            for (let x = 0; x < this.cells.length; x++) {
+                for (let y = 0; y < this.cells[0].length; y++) {
+                    let cell = this.cells[x][y];
+                    if (!cell.payload.isWall && this.Shrinkable(new Vec2(x, y))) {
+                        this.toProcess.push(cell);
+                    }
                 }
             }
         }
-        for (let cell of toShrink) {
-            cell.payload.isWall = true;
-        }
+        this.toProcess.pop().payload.isWall = true;
         return false;
     }
 
@@ -152,21 +154,21 @@ class PrimAlgorithm extends FieldController {
         if (this.carvingCount >= this.maxCarvingCount) {
             this.carvingCount = 0;
             this.stage++;
+            this.toProcess.splice(0);
             return true;
         }
-        this.carvingCount++;
-        let toCarve = new Array<Cell>();
-        for (let x = 0; x < this.cells.length; x++) {
-            for (let y = 0; y < this.cells[0].length; y++) {
-                let cell = this.cells[x][y];
-                if (cell.payload.isWall && this.Carvable(new Vec2(x, y))) {
-                    toCarve.push(cell);
+        if (this.toProcess.length == 0) {
+            this.carvingCount++;
+            for (let x = 0; x < this.cells.length; x++) {
+                for (let y = 0; y < this.cells[0].length; y++) {
+                    let cell = this.cells[x][y];
+                    if (cell.payload.isWall && this.Carvable(new Vec2(x, y))) {
+                        this.toProcess.push(cell);
+                    }
                 }
             }
         }
-        for (let cell of toCarve) {
-            cell.payload.isWall = false;
-        }
+        this.toProcess.pop().payload.isWall = false;
         return false;
     }
 
@@ -182,7 +184,7 @@ class PrimAlgorithm extends FieldController {
             console.log('Done evolving');
             this.HardReset();
         } else {
-            while(this.stageActions[this.stage]());
+            while (this.stageActions[this.stage]());
         }
     }
 }
