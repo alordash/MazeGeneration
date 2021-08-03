@@ -129,7 +129,8 @@ class PrimAlgorithm extends FieldController {
                 }
             }
         }
-        this.toProcess.pop().payload.isWall = true;
+        if (this.toProcess.length > 0)
+            this.toProcess.pop().payload.isWall = true;
         return false;
     }
 
@@ -168,7 +169,8 @@ class PrimAlgorithm extends FieldController {
                 }
             }
         }
-        this.toProcess.pop().payload.isWall = false;
+        if (this.toProcess.length > 0)
+            this.toProcess.pop().payload.isWall = false;
         return false;
     }
 
@@ -184,7 +186,12 @@ class PrimAlgorithm extends FieldController {
             console.log('Done evolving');
             this.HardReset();
         } else {
-            while (this.stageActions[this.stage]());
+            while (this.stageActions[this.stage]()) {
+                if (this.stage == this.stageActions.length) {
+                    return true;
+                }
+            }
         }
+        return false;
     }
 }
