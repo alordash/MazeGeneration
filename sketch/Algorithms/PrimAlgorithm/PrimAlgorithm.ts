@@ -96,7 +96,7 @@ class PrimAlgorithm extends FieldController {
             }
         }
         if (this.toProcess.length > 0)
-            this.toProcess.popRandom().payload.isWall = true;
+            this.toProcess.pop().payload.isWall = true;
         return false;
     }
 
@@ -136,7 +136,7 @@ class PrimAlgorithm extends FieldController {
             }
         }
         if (this.toProcess.length > 0)
-            this.toProcess.popRandom().payload.isWall = false;
+            this.toProcess.pop().payload.isWall = false;
         return false;
     }
 

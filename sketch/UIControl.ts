@@ -2,16 +2,20 @@ let playTimer: NodeJS.Timer;
 let playing = false;
 let playStep = 50;
 
-let speed = 1;
+let speed = parseInt((<HTMLInputElement>document.getElementById('speedrange')).value);
 let speedDivision = 20;
-
-const pause = 500;
 
 abstract class UIControl {
     static Init() {
         UIControl.InitInputs();
         UIControl.InitTimeRange();
         UIControl.CreateOptions();
+    }
+
+    static UIUpdate() {
+        fieldController.Draw();
+        let stageDiv = document.getElementById("StageDiv");
+        stageDiv.innerHTML = `<b>Stage: ${fieldController.stage}</b>`;
     }
 
     static UIEvolve(update = true) {
@@ -26,12 +30,11 @@ abstract class UIControl {
                     UIControl.TimeRangeClick();
                     UIControl.TimeRangeClick();
                 }
-            }, pause);
+            }, Math.min(4000, Math.max(500, fieldController.cells.length * fieldController.cells[0].length / 2.178)));
             res = true;
         }
         if (update) {
-            fieldController.Draw();
-            stageDiv.innerHTML = `<b>Stage: ${fieldController.stage}</b>`;
+            UIControl.UIUpdate();
         }
         return res;
     }
@@ -69,7 +72,7 @@ abstract class UIControl {
                 let end = Math.max(1, speed - speedDivision);
                 for (let i = 0; i < end; i++) {
                     if (UIControl.UIEvolve(i == (end - 1))) {
-                        fieldController.Draw();
+                        UIControl.UIUpdate();
                         return;
                     }
                 }
@@ -127,7 +130,7 @@ abstract class UIControl {
 
         params.appendChild(document.createElement('br'));
         params.appendChild(document.createTextNode(`${UIControl.NameFormat(key.substring(1))} `));
-        
+
         let range = document.createElement("input");
         range.id = UIControl.IdFormat(key.substring(1));
         range.type = 'text';
