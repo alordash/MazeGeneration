@@ -47,9 +47,7 @@ class PrimAlgorithm extends FieldController {
             this.stage++;
             return true;
         }
-        let index = Calc.IntRand(0, this.toCheck.length - 1);
-        let check = this.toCheck[index];
-        this.toCheck.splice(index, 1);
+        let check = this.toCheck.popRandom();
         let p = check.checkPoint;
         let cell = this.cells[p.x][p.y];
         if (!cell.payload.isWall) {
@@ -98,7 +96,7 @@ class PrimAlgorithm extends FieldController {
             }
         }
         if (this.toProcess.length > 0)
-            this.toProcess.pop().payload.isWall = true;
+            this.toProcess.popRandom().payload.isWall = true;
         return false;
     }
 
@@ -138,7 +136,7 @@ class PrimAlgorithm extends FieldController {
             }
         }
         if (this.toProcess.length > 0)
-            this.toProcess.pop().payload.isWall = false;
+            this.toProcess.popRandom().payload.isWall = false;
         return false;
     }
 
