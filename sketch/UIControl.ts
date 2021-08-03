@@ -127,7 +127,7 @@ abstract class UIControl {
 
         params.appendChild(document.createElement('br'));
         params.appendChild(document.createTextNode(`${UIControl.NameFormat(key.substring(1))} `));
-        //<input type="text" id="StepInput" value="30" class="textInput">
+        
         let range = document.createElement("input");
         range.id = UIControl.IdFormat(key.substring(1));
         range.type = 'text';
