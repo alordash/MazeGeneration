@@ -12,6 +12,7 @@ abstract class UIControl {
     static Init() {
         UIControl.InitInputs();
         UIControl.InitTimeRange();
+        UIControl.CreateOptions();
     }
 
     static UIEvolve(update = true) {
@@ -149,5 +150,25 @@ abstract class UIControl {
                 UIControl.CreateNumberParameter(fieldController, key);
             }
         }
+    }
+
+    static CreateOptions() {
+        let list = document.createElement('select');
+        list.className = 'options';
+        for (let Algorithm of Algorithms_List) {
+            let option = document.createElement('option');
+            option.innerHTML = Algorithm.name;
+            list.appendChild(option);
+        }
+
+        list.onchange = () => {
+            let Algorithm = Algorithms_List.find((x) => { return x.name == list.value; });
+            console.log('system.name :>> ', Algorithm.name);
+            fieldController = new Algorithm(canvasManager, parseInt((<HTMLInputElement>document.getElementById("StepInput")).value));
+            UIControl.CreateParametersPanel(fieldController);
+        }
+
+        let stageDiv = document.getElementById('StageDiv');
+        document.body.insertBefore(list, stageDiv);
     }
 }

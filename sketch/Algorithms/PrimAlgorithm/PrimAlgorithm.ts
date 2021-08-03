@@ -1,5 +1,5 @@
-/// <reference path = "../Field/Geometry.ts" />
-/// <reference path = "../Field/FieldController.ts" />
+/// <reference path = "../../Field/Geometry.ts" />
+/// <reference path = "../../Field/FieldController.ts" />
 
 type CheckType = { checkPoint: Vec2, clearPoint: Vec2 };
 

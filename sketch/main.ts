@@ -1,7 +1,7 @@
 /// <reference path="CanvasManager.ts" />
 /// <reference path="UIControl.ts" />
 /// <reference path="Field/FieldController.ts" />
-/// <reference path="PrimAlgorithm/PrimAlgorithm.ts" />
+/// <reference path="Algorithms/PrimAlgorithm/PrimAlgorithm.ts" />
 
 let canvasManager: CanvasManager;
 let fieldController: PrimAlgorithm;
