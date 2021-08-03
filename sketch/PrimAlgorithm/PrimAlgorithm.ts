@@ -75,7 +75,7 @@ class PrimAlgorithm extends FieldController {
     Growing = () => {
         if (this.toCheck.length == 0) {
             this.stage++;
-            return;
+            return true;
         }
         let index = Calc.IntRand(0, this.toCheck.length - 1);
         let check = this.toCheck[index];
@@ -89,6 +89,7 @@ class PrimAlgorithm extends FieldController {
         cell.payload.isWall = this.cells[check.clearPoint.x][check.clearPoint.y].payload.isWall = false;
 
         this.toCheck.push(...this.GetAvailablePoints(p));
+        return false;
     }
 
     shrinkingCount = 0;
@@ -112,7 +113,7 @@ class PrimAlgorithm extends FieldController {
         if (this.shrinkingCount >= this.maxShrinkingCount) {
             this.shrinkingCount = 0;
             this.stage++;
-            return;
+            return true;
         }
         this.shrinkingCount++;
         let toShrink = new Array<Cell>();
@@ -127,6 +128,7 @@ class PrimAlgorithm extends FieldController {
         for (let cell of toShrink) {
             cell.payload.isWall = true;
         }
+        return false;
     }
 
     carvingCount = 0;
@@ -150,7 +152,7 @@ class PrimAlgorithm extends FieldController {
         if (this.carvingCount >= this.maxCarvingCount) {
             this.carvingCount = 0;
             this.stage++;
-            return;
+            return true;
         }
         this.carvingCount++;
         let toCarve = new Array<Cell>();
@@ -165,9 +167,10 @@ class PrimAlgorithm extends FieldController {
         for (let cell of toCarve) {
             cell.payload.isWall = false;
         }
+        return false;
     }
 
-    stageActions = [
+    stageActions: Array<() => boolean> = [
         this.Growing,
         this.Shrink,
         this.Carving,
@@ -179,7 +182,7 @@ class PrimAlgorithm extends FieldController {
             console.log('Done evolving');
             this.HardReset();
         } else {
-            this.stageActions[this.stage]();
+            while(this.stageActions[this.stage]());
         }
     }
 }
