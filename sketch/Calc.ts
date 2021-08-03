@@ -36,3 +36,14 @@ abstract class Calc {
         return v;
     }
 }
+
+interface Array<T> {
+    popRandom(): T;
+}
+
+Array.prototype.popRandom = function () {
+    let i = Calc.IntRand(0, this.length - 1);
+    let v = this[i];
+    this.splice(i, 1);
+    return v;
+}
