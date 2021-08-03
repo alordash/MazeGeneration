@@ -12,7 +12,7 @@ abstract class UIControl {
         UIControl.InitTimeRange();
     }
 
-    static UIEvolve() {
+    static UIEvolve(update = true) {
         let stageDiv = document.getElementById("StageDiv");
         let res = false;
         if (fieldController.Evolve()) {
@@ -25,8 +25,10 @@ abstract class UIControl {
             }, 1000);
             res = true;
         }
-        fieldController.Draw();
-        stageDiv.innerHTML = `<b>Stage: ${fieldController.stage}</b>`;
+        if (update) {
+            fieldController.Draw();
+            stageDiv.innerHTML = `<b>Stage: ${fieldController.stage}</b>`;
+        }
         return res;
     }
 
@@ -45,7 +47,7 @@ abstract class UIControl {
             fieldController.step = parseInt((<HTMLInputElement>document.getElementById("StepInput")).value);
         };
 
-        document.getElementById("EvolveButton").onclick = UIControl.UIEvolve;
+        document.getElementById("EvolveButton").onclick = () => { UIControl.UIEvolve(); };
 
         document.getElementById("HardResetButton").onclick = ev => {
             fieldController.HardReset();
@@ -60,7 +62,7 @@ abstract class UIControl {
             playButton.textContent = "Stop";
             playTimer = setInterval(() => {
                 for (let i = 0; i < speed; i++) {
-                    if(UIControl.UIEvolve()) {
+                    if (UIControl.UIEvolve(i == speed - 1)) {
                         return;
                     }
                 }
