@@ -16,6 +16,7 @@ class DeepFirstSearch extends FieldController {
             if (hard || !Calc.IsInside(this.position.x, this.position.y, this.cells)) {
                 this.stage = 0;
                 this.position = FieldController.GetSpawn(this.canvasManager.width, this.canvasManager.height, this.step);
+                this.positions = new Array<CheckType>();
                 this.MarkPosition();
             }
         }
