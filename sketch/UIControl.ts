@@ -66,6 +66,7 @@ abstract class UIControl {
             playTimer = setInterval(() => {
                 for (let i = 0; i < speed; i++) {
                     if (UIControl.UIEvolve(i == speed - 1)) {
+                        fieldController.Draw();
                         return;
                     }
                 }
