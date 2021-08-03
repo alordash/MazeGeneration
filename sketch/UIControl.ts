@@ -72,19 +72,22 @@ abstract class UIControl {
         }
     }
 
+    static SpeedChange = () => {
+        speed = +(<HTMLInputElement>document.getElementById('speedrange')).value;
+        document.getElementById("speeddiv").innerHTML = `Speed: ${speed}`;
+    }
+
     static InitTimeRange() {
         let timeCheckbox = <HTMLInputElement>document.getElementById('TimeCheckbox');
-        let speedDiv = document.getElementById('speeddiv');
+        let speedDiv = document.getElementById('timediv');
         let speedRange = <HTMLInputElement>document.getElementById('speedrange');
         timeCheckbox.onchange = () => {
             speedDiv.style.visibility = timeCheckbox.checked ? '' : 'hidden';
         }
-        speedRange.onchange = () => {
-            speed = +speedRange.value;
-        }
+        speedRange.onchange = UIControl.SpeedChange;
         speedRange.onmousemove = (e) => {
             if (e.buttons) {
-                speed = +speedRange.value;
+                UIControl.SpeedChange();
             }
         }
 
