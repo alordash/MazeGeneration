@@ -72,6 +72,25 @@ class PrimAlgorithm extends FieldController {
         return points;
     }
 
+    Growing = () => {
+        if (this.toCheck.length == 0) {
+            this.stage++;
+            return;
+        }
+        let index = Calc.IntRand(0, this.toCheck.length - 1);
+        let check = this.toCheck[index];
+        this.toCheck.splice(index, 1);
+        let p = check.checkPoint;
+        let cell = this.cells[p.x][p.y];
+        if (!cell.payload.isWall) {
+            this.Evolve();
+            return;
+        }
+        cell.payload.isWall = this.cells[check.clearPoint.x][check.clearPoint.y].payload.isWall = false;
+
+        this.toCheck.push(...this.GetAvailablePoints(p));
+    }
+
     shrinkingCount = 0;
     maxShrinkingCount = 3;
     Shrinkable(p: Vec2) {
@@ -87,6 +106,27 @@ class PrimAlgorithm extends FieldController {
             }
         }
         return k <= 1;
+    }
+
+    Shrink = () => {
+        if (this.shrinkingCount >= this.maxShrinkingCount) {
+            this.shrinkingCount = 0;
+            this.stage++;
+            return;
+        }
+        this.shrinkingCount++;
+        let toShrink = new Array<Cell>();
+        for (let x = 0; x < this.cells.length; x++) {
+            for (let y = 0; y < this.cells[0].length; y++) {
+                let cell = this.cells[x][y];
+                if (!cell.payload.isWall && this.Shrinkable(new Vec2(x, y))) {
+                    toShrink.push(cell);
+                }
+            }
+        }
+        for (let cell of toShrink) {
+            cell.payload.isWall = true;
+        }
     }
 
     carvingCount = 0;
@@ -106,85 +146,32 @@ class PrimAlgorithm extends FieldController {
         return k >= 4;
     }
 
-    stageActions = [
-        () => {
-            if (this.toCheck.length == 0) {
-                this.stage++;
-                return;
-            }
-            let index = Calc.IntRand(0, this.toCheck.length - 1);
-            let check = this.toCheck[index];
-            this.toCheck.splice(index, 1);
-            let p = check.checkPoint;
-            let cell = this.cells[p.x][p.y];
-            if (!cell.payload.isWall) {
-                this.Evolve();
-                return;
-            }
-            cell.payload.isWall = this.cells[check.clearPoint.x][check.clearPoint.y].payload.isWall = false;
-
-            this.toCheck.push(...this.GetAvailablePoints(p));
-        },
-        () => {
-            if (this.shrinkingCount >= this.maxShrinkingCount) {
-                this.shrinkingCount = 0;
-                this.stage++;
-                return;
-            }
-            this.shrinkingCount++;
-            let toShrink = new Array<Cell>();
-            for (let x = 0; x < this.cells.length; x++) {
-                for (let y = 0; y < this.cells[0].length; y++) {
-                    let cell = this.cells[x][y];
-                    if (!cell.payload.isWall && this.Shrinkable(new Vec2(x, y))) {
-                        toShrink.push(cell);
-                    }
+    Carving = () => {
+        if (this.carvingCount >= this.maxCarvingCount) {
+            this.carvingCount = 0;
+            this.stage++;
+            return;
+        }
+        this.carvingCount++;
+        let toCarve = new Array<Cell>();
+        for (let x = 0; x < this.cells.length; x++) {
+            for (let y = 0; y < this.cells[0].length; y++) {
+                let cell = this.cells[x][y];
+                if (cell.payload.isWall && this.Carvable(new Vec2(x, y))) {
+                    toCarve.push(cell);
                 }
-            }
-            for (let cell of toShrink) {
-                cell.payload.isWall = true;
-            }
-        },
-        () => {
-            if (this.carvingCount >= this.maxCarvingCount) {
-                this.carvingCount = 0;
-                this.stage++;
-                return;
-            }
-            this.carvingCount++;
-            let toCarve = new Array<Cell>();
-            for (let x = 0; x < this.cells.length; x++) {
-                for (let y = 0; y < this.cells[0].length; y++) {
-                    let cell = this.cells[x][y];
-                    if (cell.payload.isWall && this.Carvable(new Vec2(x, y))) {
-                        toCarve.push(cell);
-                    }
-                }
-            }
-            for (let cell of toCarve) {
-                cell.payload.isWall = false;
-            }
-        },
-        () => {
-            if (this.shrinkingCount >= this.maxShrinkingCount) {
-                this.shrinkingCount = 0;
-                this.stage++;
-                return;
-            }
-            this.shrinkingCount++;
-            let toShrink = new Array<Cell>();
-            for (let x = 0; x < this.cells.length; x++) {
-                for (let y = 0; y < this.cells[0].length; y++) {
-                    let cell = this.cells[x][y];
-                    if (!cell.payload.isWall && this.Shrinkable(new Vec2(x, y))) {
-                        toShrink.push(cell);
-                    }
-                }
-            }
-            for (let cell of toShrink) {
-                cell.payload.isWall = true;
             }
         }
+        for (let cell of toCarve) {
+            cell.payload.isWall = false;
+        }
+    }
+
+    stageActions = [
+        this.Growing,
+        this.Shrink,
+        this.Carving,
+        this.Shrink
     ]
 
     Evolve() {
