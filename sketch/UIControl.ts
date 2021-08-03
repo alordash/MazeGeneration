@@ -22,9 +22,10 @@ abstract class UIControl {
             stageDiv.style.background = `#1dd12c`;
             setTimeout(() => {
                 stageDiv.style.background = ``;
-                playing = true;
-                UIControl.TimeRangeClick();
-                UIControl.TimeRangeClick();
+                if (playing) {
+                    UIControl.TimeRangeClick();
+                    UIControl.TimeRangeClick();
+                }
             }, pause);
             res = true;
         }
@@ -83,9 +84,10 @@ abstract class UIControl {
     static SpeedChange = () => {
         speed = +(<HTMLInputElement>document.getElementById('speedrange')).value;
         document.getElementById("speeddiv").innerHTML = `Speed: ${speed}`;
-        playing = true;
-        UIControl.TimeRangeClick();
-        UIControl.TimeRangeClick();
+        if (playing) {
+            UIControl.TimeRangeClick();
+            UIControl.TimeRangeClick();
+        }
     }
 
     static InitTimeRange() {
