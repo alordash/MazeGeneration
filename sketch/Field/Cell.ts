@@ -2,8 +2,10 @@
 
 class Payload {
     isWall: boolean;
-    constructor(isWall: boolean) {
+    isVisited: boolean
+    constructor(isWall = true, isVisited = false) {
         this.isWall = isWall;
+        this.isVisited = isVisited;
     }
 
     Copy() {

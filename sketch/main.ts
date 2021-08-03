@@ -4,7 +4,7 @@
 /// <reference path="Algorithms/PrimAlgorithm/PrimAlgorithm.ts" />
 
 let canvasManager: CanvasManager;
-let fieldController: PrimAlgorithm;
+let fieldController: FieldController;
 
 var p5Sketch = (_p: p5) => {
     _p.setup = () => {

@@ -4,74 +4,42 @@
 type CheckType = { checkPoint: Vec2, clearPoint: Vec2 };
 
 class PrimAlgorithm extends FieldController {
-    static GetSpawn(w: number, h: number, step: number) {
-        let x = Calc.Odd(Calc.IntRand(1, Math.floor(w / step) - 1));
-        let y = Calc.Odd(Calc.IntRand(1, Math.floor(h / step) - 1));
-        return new Vec2(x, y);
-    }
-
-    stage = 0;
-
     private static _SpawnPayload = new Payload(false);
     static get SpawnPayload() {
         return PrimAlgorithm._SpawnPayload.Copy();
     }
 
-    spawn: Vec2;
     toCheck: Array<CheckType>;
     toProcess: Array<Cell>;
 
-    MarkSpawn(payload: Payload = PrimAlgorithm.SpawnPayload) {
-        this.cells[this.spawn.x][this.spawn.y].payload = payload;
+    MarkPosition(payload: Payload = PrimAlgorithm.SpawnPayload) {
+        this.cells[this.position.x][this.position.y].payload = payload;
     }
 
-    constructor(canvasManager: CanvasManager, step: number, spawn: Vec2 = PrimAlgorithm.GetSpawn(canvasManager.width, canvasManager.height, step)) {
-        super(canvasManager, step);
-        this.spawn = spawn;
-        this.MarkSpawn();
+    constructor(canvasManager: CanvasManager, step: number, initialPosition: Vec2 = undefined) {
+        super(canvasManager, step, initialPosition);
+        this.MarkPosition();
         this.optionalReset = (hard: boolean = false) => {
-            if (hard || !Calc.IsInside(this.spawn.x, this.spawn.y, this.cells)) {
+            if (hard || !Calc.IsInside(this.position.x, this.position.y, this.cells)) {
                 this.stage = 0;
                 this.shrinkingCount = 0;
                 this.carvingCount = 0;
-                this.spawn = PrimAlgorithm.GetSpawn(this.canvasManager.width, this.canvasManager.height, this.step);
-                this.toCheck = this.GetAvailablePoints(this.spawn);
-                this.MarkSpawn();
+                this.position = FieldController.GetSpawn(this.canvasManager.width, this.canvasManager.height, this.step);
+                this.toCheck = this.GetAvailablePoints(this.position);
+                this.MarkPosition();
             } else {
                 this.toCheck = this.GetAllAvailablePoints();
             }
         }
-        this.toCheck = this.GetAvailablePoints(this.spawn);
+        this.toCheck = this.GetAvailablePoints(this.position);
         this.toProcess = new Array<Cell>();
+        this.stageActions = [
+            this.Growing,
+            this.Shrink,
+            this.Carving,
+            this.Shrink
+        ];
         this.Draw();
-    }
-
-    GetAvailablePoints(p: Vec2) {
-        let points = new Array<CheckType>();
-        let order = new Array<number>(FieldController.Directions.length);
-        for (let i = 0; i < order.length; i++) {
-            order[i] = i;
-        }
-        Calc.Shuffle(order);
-        for (const i of order) {
-            const direction = FieldController.Directions[i];
-            let newPoint = p.Sum(direction);
-            if (Calc.IsPointInside(newPoint, this.cells) && this.cells[newPoint.x][newPoint.y].payload.isWall) {
-                points.push({ checkPoint: newPoint, clearPoint: p.Sum(direction.Mul(0.5)) });
-            }
-        }
-        return points;
-    }
-
-    GetAllAvailablePoints() {
-        let points = new Array<CheckType>();
-        for (let x = 1; x < this.cells.length; x += 2) {
-            for (let y = 1; y < this.cells[0].length; y += 2) {
-                if (!this.cells[x][y].payload.isWall)
-                    points.push(...this.GetAvailablePoints(new Vec2(x, y)));
-            }
-        }
-        return points;
     }
 
     Growing = () => {
@@ -173,13 +141,6 @@ class PrimAlgorithm extends FieldController {
             this.toProcess.pop().payload.isWall = false;
         return false;
     }
-
-    stageActions: Array<() => boolean> = [
-        this.Growing,
-        this.Shrink,
-        this.Carving,
-        this.Shrink
-    ];
 
     Evolve() {
         if (this.stage >= this.stageActions.length) {

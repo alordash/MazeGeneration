@@ -4,6 +4,12 @@
 type FieldType = Array<Array<Cell>>;
 
 class FieldController {
+    static GetSpawn(w: number, h: number, step: number) {
+        let x = Calc.Odd(Calc.IntRand(1, Math.floor(w / step) - 1));
+        let y = Calc.Odd(Calc.IntRand(1, Math.floor(h / step) - 1));
+        return new Vec2(x, y);
+    }
+
     static paramMark = '$';
     static Directions = [new Vec2(2, 0), new Vec2(0, -2), new Vec2(-2, 0), new Vec2(0, 2)];
     static NeighboursLocs = [
@@ -17,9 +23,14 @@ class FieldController {
         new Vec2(1, 1)
     ];
 
+    stage = 0;
+    stageActions: Array<() => boolean>;
+
     canvasManager: CanvasManager;
     private _step: number;
     cells: FieldType;
+
+    position: Vec2;
 
     Quantiz(v: number) {
         let q = Math.round(v / this._step);
@@ -31,9 +42,10 @@ class FieldController {
 
     optionalReset = (hard: boolean = false) => { };
 
-    constructor(canvasManager: CanvasManager, step: number) {
-        this._step = step;
+    constructor(canvasManager: CanvasManager, step: number, initialPosition: Vec2 = FieldController.GetSpawn(canvasManager.width, canvasManager.height, step)) {
         this.canvasManager = canvasManager;
+        this._step = step;
+        this.position = initialPosition;
         this.canvasManager.sizeValuesProcessor = (v) => {
             return this.Quantiz(v) * this._step;
         }
@@ -61,7 +73,7 @@ class FieldController {
         this.optionalReset(hard);
         this.Draw();
     }
-    
+
     HardReset() {
         this.canvasManager.Reset(true);
         this.cells = new Array<Array<Cell>>();
@@ -72,12 +84,22 @@ class FieldController {
         let p = this.canvasManager.p5;
         for (let arr of this.cells) {
             for (let cell of arr) {
-                let v = cell.payload.isWall ? 0 : 255;
-                p.fill(v);
-                p.stroke(v);
+                let payload = cell.payload;
+                if (payload.isVisited) {
+                    p.fill(0, 0, 255);
+                    p.stroke(0, 0, 255);
+                } else {
+                    let v = payload.isWall ? 0 : 255;
+                    p.fill(v);
+                    p.stroke(v);
+                }
                 p.rect(cell.pos.x * this._step, cell.pos.y * this._step, this._step, this._step);
             }
         }
+    }
+
+    MarkCell(x: number, y: number, paylod: Payload) {
+        this.cells[x][y].payload = paylod;
     }
 
     public get step(): number {
@@ -88,5 +110,50 @@ class FieldController {
         this._step = v;
         this.canvasManager.Reset(true);
         this.Reset();
+    }
+
+    GetAvailablePoints(p: Vec2, count = -1, predicate = (cell: Cell) => { return cell.payload.isWall; }) {
+        let points = new Array<CheckType>();
+        let order = new Array<number>(FieldController.Directions.length);
+        for (let i = 0; i < order.length; i++) {
+            order[i] = i;
+        }
+        Calc.Shuffle(order);
+        for (const i of order) {
+            const direction = FieldController.Directions[i];
+            let newPoint = p.Sum(direction);
+            if (Calc.IsPointInside(newPoint, this.cells) && predicate(this.cells[newPoint.x][newPoint.y])) {
+                points.push({ checkPoint: newPoint, clearPoint: p.Sum(direction.Mul(0.5)) });
+                if (count != -1 && points.length >= count) {
+                    return points;
+                }
+            }
+        }
+        return points;
+    }
+
+    GetAllAvailablePoints(predicate = (cell: Cell) => { return cell.payload.isWall; }) {
+        let points = new Array<CheckType>();
+        for (let x = 1; x < this.cells.length; x += 2) {
+            for (let y = 1; y < this.cells[0].length; y += 2) {
+                if (!this.cells[x][y].payload.isWall)
+                    points.push(...this.GetAvailablePoints(new Vec2(x, y), undefined, predicate));
+            }
+        }
+        return points;
+    }
+
+    Evolve() {
+        if (this.stage >= this.stageActions.length) {
+            console.log('Done evolving');
+            this.HardReset();
+        } else {
+            while (this.stageActions[this.stage]()) {
+                if (this.stage == this.stageActions.length) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

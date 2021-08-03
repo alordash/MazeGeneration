@@ -163,7 +163,7 @@ abstract class UIControl {
 
         list.onchange = () => {
             let Algorithm = Algorithms_List.find((x) => { return x.name == list.value; });
-            console.log('system.name :>> ', Algorithm.name);
+            console.log('Algorithm.name :>> ', Algorithm.name);
             fieldController = new Algorithm(canvasManager, parseInt((<HTMLInputElement>document.getElementById("StepInput")).value));
             UIControl.CreateParametersPanel(fieldController);
         }
