@@ -4,6 +4,7 @@
 type FieldType = Array<Array<Cell>>;
 
 class FieldController {
+    static paramMark = '$';
     static Directions = [new Vec2(2, 0), new Vec2(0, -2), new Vec2(-2, 0), new Vec2(0, 2)];
     static NeighboursLocs = [
         new Vec2(1, 0),

@@ -6,6 +6,8 @@ let time = 6;
 let fps = 10;
 let speed = 1;
 
+const pause = 500;
+
 abstract class UIControl {
     static Init() {
         UIControl.InitInputs();
@@ -22,7 +24,7 @@ abstract class UIControl {
                 stageDiv.style.background = ``;
                 playing = !playing;
                 UIControl.TimeRangeClick();
-            }, 1000);
+            }, pause);
             res = true;
         }
         if (update) {
@@ -95,5 +97,57 @@ abstract class UIControl {
 
         let playButton = <HTMLInputElement>document.getElementById('PlayButton');
         playButton.onclick = UIControl.TimeRangeClick;
+    }
+
+    static IdFormat(s: string) {
+        return `${s}range`;
+    }
+
+    static NameFormat(s: string) {
+        let letters = s.match(/[A-Z]/g);
+        let parts = s.split(/[A-Z]/g);
+        parts[0] = parts[0][0].toUpperCase() + parts[0].substring(1);
+        for (let i = 1; i < parts.length; i++) {
+            parts[i] = letters[i - 1].toLowerCase() + parts[i];
+        }
+        return parts.join(' ');
+    }
+
+    static CreateNumberParameter(fieldContoller: FieldController, key: string) {
+        const params = document.getElementById('Params');
+
+        params.appendChild(document.createElement('br'));
+        params.appendChild(document.createTextNode(`${UIControl.NameFormat(key.substring(1))} `));
+        //<input type="text" id="StepInput" value="30" class="textInput">
+        let range = document.createElement("input");
+        range.id = UIControl.IdFormat(key.substring(1));
+        range.type = 'text';
+        range.className = 'textInput';
+        range.value = fieldContoller[key].toString();
+
+        range.onchange = () => {
+            fieldContoller[key] = +range.value;
+        }
+        range.onmousemove = (e) => {
+            if (e.buttons) {
+                fieldContoller[key] = +range.value;
+            }
+        }
+        params.appendChild(range);
+    }
+
+    static CreateParametersPanel(fieldController: FieldController) {
+        let ranges = Array.from(document.getElementById('Params').childNodes.values()).filter(x => {
+            return (<HTMLElement>x).className == 'rangeParam';
+        });
+        for (let range of ranges) {
+            range.remove();
+        }
+        document.getElementById('Params').innerHTML = `<b>Parameters</b>`;
+        for (let [key, value] of Object.entries(fieldController)) {
+            if (key[0] == FieldController.paramMark) {
+                UIControl.CreateNumberParameter(fieldController, key);
+            }
+        }
     }
 }

@@ -95,7 +95,7 @@ class PrimAlgorithm extends FieldController {
     }
 
     shrinkingCount = 0;
-    maxShrinkingCount = 3;
+    $maxShrinkingCount = 3;
     Shrinkable(p: Vec2) {
         let k = 0;
         for (const loc of FieldController.Directions) {
@@ -112,7 +112,7 @@ class PrimAlgorithm extends FieldController {
     }
 
     Shrink = () => {
-        if (this.shrinkingCount > this.maxShrinkingCount) {
+        if (this.shrinkingCount > this.$maxShrinkingCount) {
             this.shrinkingCount = 0;
             this.stage++;
             this.toProcess.splice(0);
@@ -135,7 +135,7 @@ class PrimAlgorithm extends FieldController {
     }
 
     carvingCount = 0;
-    maxCarvingCount = 3;
+    $maxCarvingCount = 3;
     Carvable(p: Vec2) {
         let k = 0;
         for (const loc of FieldController.NeighboursLocs) {
@@ -152,7 +152,7 @@ class PrimAlgorithm extends FieldController {
     }
 
     Carving = () => {
-        if (this.carvingCount > this.maxCarvingCount) {
+        if (this.carvingCount > this.$maxCarvingCount) {
             this.carvingCount = 0;
             this.stage++;
             this.toProcess.splice(0);
@@ -179,7 +179,7 @@ class PrimAlgorithm extends FieldController {
         this.Shrink,
         this.Carving,
         this.Shrink
-    ]
+    ];
 
     Evolve() {
         if (this.stage >= this.stageActions.length) {

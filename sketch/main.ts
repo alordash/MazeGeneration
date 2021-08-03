@@ -30,6 +30,7 @@ function main() {
     fieldController.Draw();
 
     UIControl.Init();
+    UIControl.CreateParametersPanel(fieldController);
 }
 
 setTimeout(main, 10);
