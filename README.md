@@ -1,6 +1,6 @@
 # Maze Generator
 
-Runtime [labirinth](https://en.wikipedia.org/wiki/Maze_generation_algorithm) generator.  
+Runtime [labyrinth](https://en.wikipedia.org/wiki/Maze_generation_algorithm) generator.  
 ### [Available here (open link)](https://alordash.github.io/MazeGeneration/static/index.html)
   
 Can use:
