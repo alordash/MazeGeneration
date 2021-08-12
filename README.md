@@ -1,7 +1,8 @@
 # Maze Generator
 
 Runtime [labyrinth](https://en.wikipedia.org/wiki/Maze_generation_algorithm) generator.  
-### [Available here (open link)](https://alordash.github.io/MazeGeneration/static/index.html)
+
+### [>>Click<<](https://alordash.github.io/MazeGeneration/static/index.html) to open in your browser.  
   
 Can use:
 1. [Randomized Prim's algorithm](https://en.wikipedia.org/wiki/Maze_generation_algorithm#Randomized_Prim's_algorithm) (with 2, 3 and 4 stages used for generating [caves](https://habr.com/ru/post/537630/))
