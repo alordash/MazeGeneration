@@ -3,7 +3,7 @@ let playing = false;
 let playStep = 50;
 
 let speed = parseInt((<HTMLInputElement>document.getElementById('speedrange')).value);
-let speedDivision = 20;
+let speedDivision = 50;
 
 abstract class UIControl {
     static Init() {
