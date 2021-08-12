@@ -8,7 +8,7 @@ class PrimAlgorithm extends FieldController {
     toProcess: Array<Cell>;
 
     MarkPosition(state = States.empty) {
-        this.cells[this.position.x][this.position.y].state = state;
+        this.MarkCell(this.position.x, this.position.y, state);
     }
 
     constructor(canvasManager: CanvasManager, step: number, initialPosition: Vec2 = undefined) {
@@ -49,7 +49,8 @@ class PrimAlgorithm extends FieldController {
             this.Evolve();
             return;
         }
-        cell.state = this.cells[check.clearPoint.x][check.clearPoint.y].state = States.empty;
+        this.MarkCell(p.x, p.y, States.empty);
+        this.MarkCell(check.clearPoint.x, check.clearPoint.y, States.empty);
 
         this.toCheck.push(...this.GetAvailablePoints(p));
         return false;
@@ -90,8 +91,10 @@ class PrimAlgorithm extends FieldController {
                 }
             }
         }
-        if (this.toProcess.length > 0)
-            this.toProcess.pop().state = States.wall;
+        if (this.toProcess.length > 0) {
+            const p = this.toProcess.pop().pos;
+            this.MarkCell(p.x, p.y, States.wall);
+        }
         return false;
     }
 
@@ -103,7 +106,7 @@ class PrimAlgorithm extends FieldController {
             let _p = p.Sum(loc);
             if (!Calc.IsInside(_p.x, _p.y, this.cells))
                 continue;
-            if (this.cells[_p.x][_p.y].state == States.empty) {
+            if (this.cells[_p.x][_p.y].state== States.empty) {
                 k++;
                 if (k >= 4)
                     return true;
@@ -130,8 +133,10 @@ class PrimAlgorithm extends FieldController {
                 }
             }
         }
-        if (this.toProcess.length > 0)
-            this.toProcess.pop().state = States.empty;
+        if (this.toProcess.length > 0) {
+            const p = this.toProcess.pop().pos;
+            this.MarkCell(p.x, p.y, States.empty);
+        }
         return false;
     }
 

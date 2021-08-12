@@ -82,7 +82,6 @@ class UIControl {
         UIControl.CreateOptions();
     }
     static UIUpdate() {
-        fieldController.Draw();
         let stageDiv = document.getElementById("StageDiv");
         stageDiv.innerHTML = `<b>Stage: ${fieldController.stage}</b>`;
     }
@@ -421,7 +420,8 @@ class PrimAlgorithm extends FieldController {
                 this.Evolve();
                 return;
             }
-            cell.state = this.cells[check.clearPoint.x][check.clearPoint.y].state = States.empty;
+            this.MarkCell(p.x, p.y, States.empty);
+            this.MarkCell(check.clearPoint.x, check.clearPoint.y, States.empty);
             this.toCheck.push(...this.GetAvailablePoints(p));
             return false;
         };
@@ -445,8 +445,10 @@ class PrimAlgorithm extends FieldController {
                     }
                 }
             }
-            if (this.toProcess.length > 0)
-                this.toProcess.pop().state = States.wall;
+            if (this.toProcess.length > 0) {
+                const p = this.toProcess.pop().pos;
+                this.MarkCell(p.x, p.y, States.wall);
+            }
             return false;
         };
         this.carvingCount = 0;
@@ -469,8 +471,10 @@ class PrimAlgorithm extends FieldController {
                     }
                 }
             }
-            if (this.toProcess.length > 0)
-                this.toProcess.pop().state = States.empty;
+            if (this.toProcess.length > 0) {
+                const p = this.toProcess.pop().pos;
+                this.MarkCell(p.x, p.y, States.empty);
+            }
             return false;
         };
         this.MarkPosition();
@@ -498,7 +502,7 @@ class PrimAlgorithm extends FieldController {
         this.Draw();
     }
     MarkPosition(state = States.empty) {
-        this.cells[this.position.x][this.position.y].state = state;
+        this.MarkCell(this.position.x, this.position.y, state);
     }
     Shrinkable(p) {
         let k = 0;
@@ -614,7 +618,7 @@ class DeepFirstSearch extends FieldController {
         this.Draw();
     }
     MarkPosition(state = States.empty) {
-        this.cells[this.position.x][this.position.y].state = state;
+        this.MarkCell(this.position.x, this.position.y, state);
     }
 }
 const Algorithms_List = [

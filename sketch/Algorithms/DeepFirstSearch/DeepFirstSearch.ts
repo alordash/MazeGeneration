@@ -3,7 +3,7 @@
 
 class DeepFirstSearch extends FieldController {
     MarkPosition(state = States.empty) {
-        this.cells[this.position.x][this.position.y].state = state;
+        this.MarkCell(this.position.x, this.position.y, state);
     }
 
     positions: Array<CheckType>;
