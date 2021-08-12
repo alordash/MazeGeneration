@@ -53,7 +53,7 @@ class CanvasManager {
         this.p5.background(0);
         this.p5.fill(255);
         this.p5.stroke(0);
-        this.p5.strokeWeight(2);
+        this.p5.strokeWeight(0);
     }
     get width() {
         return this._width;
@@ -98,7 +98,7 @@ class UIControl {
                     UIControl.TimeRangeClick();
                     UIControl.TimeRangeClick();
                 }
-            }, Math.max(500, fieldController.cells.length * fieldController.cells[0].length / 2.178));
+            }, Math.min(4000, Math.max(500, fieldController.cells.length * fieldController.cells[0].length / 2.178)));
             res = true;
         }
         if (update) {
@@ -245,23 +245,16 @@ class Vec2 {
         return new Vec2(this.x * k, this.y * k);
     }
 }
-class Payload {
-    constructor(isWall = true, isVisited = false) {
-        this.isWall = isWall;
-        this.isVisited = isVisited;
-    }
-    Copy() {
-        return new Payload(this.isWall);
-    }
-    static get Default() {
-        return this._Default.Copy();
-    }
-}
-Payload._Default = new Payload(true);
+var States;
+(function (States) {
+    States[States["empty"] = 0] = "empty";
+    States[States["wall"] = 1] = "wall";
+    States[States["visited"] = 2] = "visited";
+})(States || (States = {}));
 class Cell {
-    constructor(pos, payload = Payload.Default) {
+    constructor(pos, state = States.wall) {
         this.pos = pos;
-        this.payload = payload;
+        this.state = state;
     }
 }
 class FieldController {
@@ -314,26 +307,39 @@ class FieldController {
         this.cells = new Array();
         this.Reset(true);
     }
+    Palette(state) {
+        let p5 = this.canvasManager.p5;
+        switch (state) {
+            case States.empty:
+                p5.fill(255);
+                break;
+            case States.visited:
+                p5.fill(0, 0, 255);
+                break;
+            case States.wall:
+                p5.fill(0);
+                break;
+            default:
+                break;
+        }
+    }
+    DrawCell(cell) {
+        this.Palette(cell.state);
+        const p = cell.pos;
+        this.canvasManager.p5.rect(p.x * this._step, p.y * this._step, this._step, this._step);
+    }
     Draw() {
         let p = this.canvasManager.p5;
         for (let arr of this.cells) {
             for (let cell of arr) {
-                let payload = cell.payload;
-                if (payload.isVisited) {
-                    p.fill(0, 0, 255);
-                    p.stroke(0, 0, 255);
-                }
-                else {
-                    let v = payload.isWall ? 0 : 255;
-                    p.fill(v);
-                    p.stroke(v);
-                }
-                p.rect(cell.pos.x * this._step, cell.pos.y * this._step, this._step, this._step);
+                this.DrawCell(cell);
             }
         }
     }
-    MarkCell(x, y, paylod) {
-        this.cells[x][y].payload = paylod;
+    MarkCell(x, y, state) {
+        let cell = this.cells[x][y];
+        cell.state = state;
+        this.DrawCell(cell);
     }
     get step() {
         return this._step;
@@ -343,7 +349,7 @@ class FieldController {
         this.canvasManager.Reset(true);
         this.Reset();
     }
-    GetAvailablePoints(p, count = -1, predicate = (cell) => { return cell.payload.isWall; }) {
+    GetAvailablePoints(p, count = -1, predicate = FieldController.DefaultPredicate) {
         let points = new Array();
         let order = new Array(FieldController.Directions.length);
         for (let i = 0; i < order.length; i++) {
@@ -362,11 +368,11 @@ class FieldController {
         }
         return points;
     }
-    GetAllAvailablePoints(predicate = (cell) => { return cell.payload.isWall; }) {
+    GetAllAvailablePoints(predicate = FieldController.DefaultPredicate) {
         let points = new Array();
         for (let x = 1; x < this.cells.length; x += 2) {
             for (let y = 1; y < this.cells[0].length; y += 2) {
-                if (!this.cells[x][y].payload.isWall)
+                if (this.cells[x][y].state != States.wall)
                     points.push(...this.GetAvailablePoints(new Vec2(x, y), undefined, predicate));
             }
         }
@@ -399,6 +405,7 @@ FieldController.NeighboursLocs = [
     new Vec2(0, 1),
     new Vec2(1, 1)
 ];
+FieldController.DefaultPredicate = (cell) => { return cell.state == States.wall; };
 class PrimAlgorithm extends FieldController {
     constructor(canvasManager, step, initialPosition = undefined) {
         super(canvasManager, step, initialPosition);
@@ -410,11 +417,11 @@ class PrimAlgorithm extends FieldController {
             let check = this.toCheck.popRandom();
             let p = check.checkPoint;
             let cell = this.cells[p.x][p.y];
-            if (!cell.payload.isWall) {
+            if (cell.state == States.empty) {
                 this.Evolve();
                 return;
             }
-            cell.payload.isWall = this.cells[check.clearPoint.x][check.clearPoint.y].payload.isWall = false;
+            cell.state = this.cells[check.clearPoint.x][check.clearPoint.y].state = States.empty;
             this.toCheck.push(...this.GetAvailablePoints(p));
             return false;
         };
@@ -432,14 +439,14 @@ class PrimAlgorithm extends FieldController {
                 for (let x = 0; x < this.cells.length; x++) {
                     for (let y = 0; y < this.cells[0].length; y++) {
                         let cell = this.cells[x][y];
-                        if (!cell.payload.isWall && this.Shrinkable(new Vec2(x, y))) {
+                        if (cell.state == States.empty && this.Shrinkable(new Vec2(x, y))) {
                             this.toProcess.push(cell);
                         }
                     }
                 }
             }
             if (this.toProcess.length > 0)
-                this.toProcess.pop().payload.isWall = true;
+                this.toProcess.pop().state = States.wall;
             return false;
         };
         this.carvingCount = 0;
@@ -456,14 +463,14 @@ class PrimAlgorithm extends FieldController {
                 for (let x = 0; x < this.cells.length; x++) {
                     for (let y = 0; y < this.cells[0].length; y++) {
                         let cell = this.cells[x][y];
-                        if (cell.payload.isWall && this.Carvable(new Vec2(x, y))) {
+                        if (cell.state == States.wall && this.Carvable(new Vec2(x, y))) {
                             this.toProcess.push(cell);
                         }
                     }
                 }
             }
             if (this.toProcess.length > 0)
-                this.toProcess.pop().payload.isWall = false;
+                this.toProcess.pop().state = States.empty;
             return false;
         };
         this.MarkPosition();
@@ -490,11 +497,8 @@ class PrimAlgorithm extends FieldController {
         ];
         this.Draw();
     }
-    static get SpawnPayload() {
-        return PrimAlgorithm._SpawnPayload.Copy();
-    }
-    MarkPosition(payload = PrimAlgorithm.SpawnPayload) {
-        this.cells[this.position.x][this.position.y].payload = payload;
+    MarkPosition(state = States.empty) {
+        this.cells[this.position.x][this.position.y].state = state;
     }
     Shrinkable(p) {
         let k = 0;
@@ -502,7 +506,7 @@ class PrimAlgorithm extends FieldController {
             let _p = p.Sum(loc.Mul(0.5));
             if (!Calc.IsInside(_p.x, _p.y, this.cells))
                 continue;
-            if (!this.cells[_p.x][_p.y].payload.isWall) {
+            if (this.cells[_p.x][_p.y].state == States.empty) {
                 k++;
                 if (k > 1)
                     return false;
@@ -516,7 +520,7 @@ class PrimAlgorithm extends FieldController {
             let _p = p.Sum(loc);
             if (!Calc.IsInside(_p.x, _p.y, this.cells))
                 continue;
-            if (!this.cells[_p.x][_p.y].payload.isWall) {
+            if (this.cells[_p.x][_p.y].state == States.empty) {
                 k++;
                 if (k >= 4)
                     return true;
@@ -539,7 +543,6 @@ class PrimAlgorithm extends FieldController {
         return false;
     }
 }
-PrimAlgorithm._SpawnPayload = new Payload(false);
 let canvasManager;
 let fieldController;
 var p5Sketch = (_p) => {
@@ -549,7 +552,7 @@ var p5Sketch = (_p) => {
         document.getElementById('Editor').appendChild(htmlElement);
         _p.fill(255);
         _p.stroke(0);
-        _p.strokeWeight(2);
+        _p.strokeWeight(0);
     };
 };
 let _p = new p5(p5Sketch);
@@ -569,29 +572,29 @@ class DeepFirstSearch extends FieldController {
     constructor(canvasManager, step, initialPosition = undefined) {
         super(canvasManager, step, initialPosition);
         this.Search = () => {
-            let payload;
+            let state;
             let check;
             let walls = this.GetAvailablePoints(this.position, 1, cell => {
-                return cell.payload.isWall && !cell.payload.isVisited;
+                return cell.state == States.wall;
             });
             if (walls.length > 0) {
+                state = States.empty;
                 check = walls[0];
-                payload = new Payload(false);
                 this.positions.push({ checkPoint: this.position, clearPoint: check.clearPoint });
-                this.MarkCell(check.checkPoint.x, check.checkPoint.y, payload);
+                this.MarkCell(check.checkPoint.x, check.checkPoint.y, state);
             }
             else {
-                payload = new Payload(false, true);
+                state = States.visited;
                 if (this.positions.length == 0) {
                     this.stage++;
-                    this.MarkCell(this.position.x, this.position.y, payload);
+                    this.MarkCell(this.position.x, this.position.y, state);
                     return true;
                 }
                 check = this.positions.pop();
-                this.MarkCell(this.position.x, this.position.y, payload);
+                this.MarkCell(this.position.x, this.position.y, state);
             }
             let p = check.clearPoint;
-            this.MarkCell(p.x, p.y, payload);
+            this.MarkCell(p.x, p.y, state);
             this.position = check.checkPoint;
             return false;
         };
@@ -601,6 +604,7 @@ class DeepFirstSearch extends FieldController {
             if (hard || !Calc.IsInside(this.position.x, this.position.y, this.cells)) {
                 this.stage = 0;
                 this.position = FieldController.GetSpawn(this.canvasManager.width, this.canvasManager.height, this.step);
+                this.positions = new Array();
                 this.MarkPosition();
             }
         };
@@ -609,8 +613,8 @@ class DeepFirstSearch extends FieldController {
         ];
         this.Draw();
     }
-    MarkPosition(payload = PrimAlgorithm.SpawnPayload) {
-        this.cells[this.position.x][this.position.y].payload = payload;
+    MarkPosition(state = States.empty) {
+        this.cells[this.position.x][this.position.y].state = state;
     }
 }
 const Algorithms_List = [

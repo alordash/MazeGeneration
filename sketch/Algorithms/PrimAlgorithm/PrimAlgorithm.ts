@@ -4,16 +4,11 @@
 type CheckType = { checkPoint: Vec2, clearPoint: Vec2 };
 
 class PrimAlgorithm extends FieldController {
-    private static _SpawnPayload = new Payload(false);
-    static get SpawnPayload() {
-        return PrimAlgorithm._SpawnPayload.Copy();
-    }
-
     toCheck: Array<CheckType>;
     toProcess: Array<Cell>;
 
-    MarkPosition(payload: Payload = PrimAlgorithm.SpawnPayload) {
-        this.cells[this.position.x][this.position.y].payload = payload;
+    MarkPosition(state = States.empty) {
+        this.cells[this.position.x][this.position.y].state = state;
     }
 
     constructor(canvasManager: CanvasManager, step: number, initialPosition: Vec2 = undefined) {
@@ -50,11 +45,11 @@ class PrimAlgorithm extends FieldController {
         let check = this.toCheck.popRandom();
         let p = check.checkPoint;
         let cell = this.cells[p.x][p.y];
-        if (!cell.payload.isWall) {
+        if (cell.state == States.empty) {
             this.Evolve();
             return;
         }
-        cell.payload.isWall = this.cells[check.clearPoint.x][check.clearPoint.y].payload.isWall = false;
+        cell.state = this.cells[check.clearPoint.x][check.clearPoint.y].state = States.empty;
 
         this.toCheck.push(...this.GetAvailablePoints(p));
         return false;
@@ -68,7 +63,7 @@ class PrimAlgorithm extends FieldController {
             let _p = p.Sum(loc.Mul(0.5));
             if (!Calc.IsInside(_p.x, _p.y, this.cells))
                 continue;
-            if (!this.cells[_p.x][_p.y].payload.isWall) {
+            if (this.cells[_p.x][_p.y].state == States.empty) {
                 k++;
                 if (k > 1)
                     return false;
@@ -89,14 +84,14 @@ class PrimAlgorithm extends FieldController {
             for (let x = 0; x < this.cells.length; x++) {
                 for (let y = 0; y < this.cells[0].length; y++) {
                     let cell = this.cells[x][y];
-                    if (!cell.payload.isWall && this.Shrinkable(new Vec2(x, y))) {
+                    if (cell.state == States.empty && this.Shrinkable(new Vec2(x, y))) {
                         this.toProcess.push(cell);
                     }
                 }
             }
         }
         if (this.toProcess.length > 0)
-            this.toProcess.pop().payload.isWall = true;
+            this.toProcess.pop().state = States.wall;
         return false;
     }
 
@@ -108,7 +103,7 @@ class PrimAlgorithm extends FieldController {
             let _p = p.Sum(loc);
             if (!Calc.IsInside(_p.x, _p.y, this.cells))
                 continue;
-            if (!this.cells[_p.x][_p.y].payload.isWall) {
+            if (this.cells[_p.x][_p.y].state == States.empty) {
                 k++;
                 if (k >= 4)
                     return true;
@@ -129,14 +124,14 @@ class PrimAlgorithm extends FieldController {
             for (let x = 0; x < this.cells.length; x++) {
                 for (let y = 0; y < this.cells[0].length; y++) {
                     let cell = this.cells[x][y];
-                    if (cell.payload.isWall && this.Carvable(new Vec2(x, y))) {
+                    if (cell.state == States.wall && this.Carvable(new Vec2(x, y))) {
                         this.toProcess.push(cell);
                     }
                 }
             }
         }
         if (this.toProcess.length > 0)
-            this.toProcess.pop().payload.isWall = false;
+            this.toProcess.pop().state = States.empty;
         return false;
     }
 

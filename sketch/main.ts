@@ -13,7 +13,7 @@ var p5Sketch = (_p: p5) => {
         document.getElementById('Editor').appendChild(htmlElement);
         _p.fill(255);
         _p.stroke(0);
-        _p.strokeWeight(2);
+        _p.strokeWeight(0);
     };
 };
 

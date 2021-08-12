@@ -80,26 +80,42 @@ class FieldController {
         this.Reset(true);
     }
 
+    Palette(state: States) {
+        let p5 = this.canvasManager.p5;
+        switch (state) {
+            case States.empty:
+                p5.fill(255);
+                break;
+            case States.visited:
+                p5.fill(0, 0, 255);
+                break;
+            case States.wall:
+                p5.fill(0);
+                break;
+            default:
+                break;
+        }
+    }
+
+    DrawCell(cell: Cell) {
+        this.Palette(cell.state);
+        const p = cell.pos;
+        this.canvasManager.p5.rect(p.x * this._step, p.y * this._step, this._step, this._step);
+    }
+
     Draw() {
         let p = this.canvasManager.p5;
         for (let arr of this.cells) {
             for (let cell of arr) {
-                let payload = cell.payload;
-                if (payload.isVisited) {
-                    p.fill(0, 0, 255);
-                    p.stroke(0, 0, 255);
-                } else {
-                    let v = payload.isWall ? 0 : 255;
-                    p.fill(v);
-                    p.stroke(v);
-                }
-                p.rect(cell.pos.x * this._step, cell.pos.y * this._step, this._step, this._step);
+                this.DrawCell(cell);
             }
         }
     }
 
-    MarkCell(x: number, y: number, paylod: Payload) {
-        this.cells[x][y].payload = paylod;
+    MarkCell(x: number, y: number, state: States) {
+        let cell = this.cells[x][y];
+        cell.state = state;
+        this.DrawCell(cell);
     }
 
     public get step(): number {
@@ -112,7 +128,9 @@ class FieldController {
         this.Reset();
     }
 
-    GetAvailablePoints(p: Vec2, count = -1, predicate = (cell: Cell) => { return cell.payload.isWall; }) {
+    static DefaultPredicate = (cell: Cell) => { return cell.state == States.wall; };
+
+    GetAvailablePoints(p: Vec2, count = -1, predicate = FieldController.DefaultPredicate) {
         let points = new Array<CheckType>();
         let order = new Array<number>(FieldController.Directions.length);
         for (let i = 0; i < order.length; i++) {
@@ -132,11 +150,11 @@ class FieldController {
         return points;
     }
 
-    GetAllAvailablePoints(predicate = (cell: Cell) => { return cell.payload.isWall; }) {
+    GetAllAvailablePoints(predicate = FieldController.DefaultPredicate) {
         let points = new Array<CheckType>();
         for (let x = 1; x < this.cells.length; x += 2) {
             for (let y = 1; y < this.cells[0].length; y += 2) {
-                if (!this.cells[x][y].payload.isWall)
+                if (this.cells[x][y].state != States.wall)
                     points.push(...this.GetAvailablePoints(new Vec2(x, y), undefined, predicate));
             }
         }

@@ -2,8 +2,8 @@
 /// <reference path = "../../Field/FieldController.ts" />
 
 class DeepFirstSearch extends FieldController {
-    MarkPosition(payload: Payload = PrimAlgorithm.SpawnPayload) {
-        this.cells[this.position.x][this.position.y].payload = payload;
+    MarkPosition(state = States.empty) {
+        this.cells[this.position.x][this.position.y].state = state;
     }
 
     positions: Array<CheckType>;
@@ -27,28 +27,28 @@ class DeepFirstSearch extends FieldController {
     }
 
     Search = () => {
-        let payload: Payload;
+        let state: States;
         let check: CheckType;
         let walls = this.GetAvailablePoints(this.position, 1, cell => {
-            return cell.payload.isWall && !cell.payload.isVisited;
+            return cell.state == States.wall;
         });
         if (walls.length > 0) {
+            state = States.empty;
             check = walls[0];
-            payload = new Payload(false);
             this.positions.push({ checkPoint: this.position, clearPoint: check.clearPoint });
-            this.MarkCell(check.checkPoint.x, check.checkPoint.y, payload);
+            this.MarkCell(check.checkPoint.x, check.checkPoint.y, state);
         } else {
-            payload = new Payload(false, true);
+            state = States.visited;
             if(this.positions.length == 0) {
                 this.stage++;
-                this.MarkCell(this.position.x, this.position.y, payload);
+                this.MarkCell(this.position.x, this.position.y, state);
                 return true;
             }
             check = this.positions.pop();
-            this.MarkCell(this.position.x, this.position.y, payload);
+            this.MarkCell(this.position.x, this.position.y, state);
         }
         let p = check.clearPoint;
-        this.MarkCell(p.x, p.y, payload);
+        this.MarkCell(p.x, p.y, state);
         this.position = check.checkPoint;
         return false;
     }
